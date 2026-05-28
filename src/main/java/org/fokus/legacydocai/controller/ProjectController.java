@@ -4,7 +4,6 @@ import jakarta.servlet.http.HttpSession;
 import org.fokus.legacydocai.services.DocumentLoaderService;
 import org.fokus.legacydocai.services.ProjectService;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -25,7 +24,7 @@ public class ProjectController {
 
     private static final String SESSION_PROJECT_PATH = "currentProjectPath";
     private static final String SESSION_FILES_COUNT = "projectFilesCount";
-    private static final String SESSION_JAVA_COUNT = "javaClassesCount";
+    private static final String SESSION_CODE_COUNT = "CodeClassesCount";
     private static final String SESSION_LAST_INDEX = "lastIndexation";
 
     @PostMapping("/select")
@@ -41,12 +40,12 @@ public class ProjectController {
         if (projectService.isValidDirectory(projectPath)) {
             documentLoaderService.loadDocuments(projectPath);
             long files = projectService.countFiles(projectPath);
-            long javaClasses = projectService.countJavaClasses(projectPath);
+            long codeClasses = projectService.countCodeClasses(projectPath);
             String lastIndex = projectService.getCurrentTimestamp();
 
             session.setAttribute(SESSION_PROJECT_PATH, projectPath);
             session.setAttribute(SESSION_FILES_COUNT, files);
-            session.setAttribute(SESSION_JAVA_COUNT, javaClasses);
+            session.setAttribute(SESSION_CODE_COUNT, codeClasses);
             session.setAttribute(SESSION_LAST_INDEX, lastIndex);
         } else {
             redirectAttributes.addFlashAttribute("error", "Некорректный путь к проекту или директория не существует");

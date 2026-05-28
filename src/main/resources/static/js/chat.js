@@ -133,28 +133,50 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // PROJECT MODAL
 
-    const projectModal =
-        document.getElementById("project-modal");
+    const projectModal = document.getElementById("project-modal");
+    const openProjectModal = document.getElementById("open-project-modal");
+    const closeProjectModal = document.getElementById("close-project-modal");
 
-    const openProjectModal =
-        document.getElementById("open-project-modal");
+    const projectForm = document.getElementById("project-form");
+    const projectSubmitBtn = document.getElementById("project-submit-btn");
+    const modalContent = document.querySelector(".modal-content");
 
-    const closeProjectModal =
-        document.getElementById("close-project-modal");
+    // Открытие модального окна
+    if (openProjectModal && projectModal) {
+        openProjectModal.addEventListener("click", function () {
+            if (modalContent) modalContent.classList.remove("loading");
+            if (closeProjectModal) closeProjectModal.style.display = "inline-block";
 
-    if (openProjectModal) {
-
-        openProjectModal.addEventListener("click", () => {
+            if (projectSubmitBtn) {
+                const btnText = projectSubmitBtn.querySelector("span:not(.spinner)");
+                if (btnText) btnText.textContent = "Подключить";
+            }
 
             projectModal.classList.remove("hidden");
         });
     }
 
-    if (closeProjectModal) {
-
-        closeProjectModal.addEventListener("click", () => {
-
+    // Закрытие модального окна
+    if (closeProjectModal && projectModal) {
+        closeProjectModal.addEventListener("click", function () {
             projectModal.classList.add("hidden");
+        });
+    }
+
+    // Анимация при отправке формы
+    if (projectForm && projectSubmitBtn && modalContent) {
+        projectForm.addEventListener("submit", function () {
+
+            modalContent.classList.add("loading");
+
+            const btnText = projectSubmitBtn.querySelector("span:not(.spinner)");
+            if (btnText) {
+                btnText.textContent = "Индексация проекта...";
+            }
+
+            if (closeProjectModal) {
+                closeProjectModal.style.display = "none";
+            }
         });
     }
 

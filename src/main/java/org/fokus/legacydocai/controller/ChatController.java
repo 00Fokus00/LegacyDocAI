@@ -65,8 +65,8 @@ public class ChatController {
         );
 
         model.addAttribute(
-                "javaClassesCount",
-                session.getAttribute("javaClassesCount")
+                "CodeClassesCount",
+                session.getAttribute("CodeClassesCount")
         );
 
         model.addAttribute(

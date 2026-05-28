@@ -441,3 +441,32 @@ body {
 .cancel-btn:hover {
     background: #d1d5db;
 }
+
+/* Блокируем только элементы формы во время отправки */
+.modal-content.loading input,
+.modal-content.loading .modal-actions button {
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+/* Спиннер */
+.spinner {
+    display: none;
+    width: 18px;
+    height: 18px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+    margin-left: 10px;
+    vertical-align: middle;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Показываем спиннер, только если у родителя есть класс loading */
+.modal-content.loading .spinner {
+    display: inline-block;
+}

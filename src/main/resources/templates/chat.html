@@ -53,8 +53,8 @@
                     </div>
 
                     <div class="info-item">
-                        <span>Java-классов</span>
-                        <strong th:text="${javaClassesCount ?: 0}">91</strong>
+                        <span>Программных файлов</span>
+                        <strong th:text="${CodeClassesCount ?: 0}">91</strong>
                     </div>
 
                     <div class="info-item">
@@ -202,8 +202,7 @@
             Укажите путь к директории проекта для RAG-индексации
         </p>
 
-        <form action="/project/select"
-              method="post">
+        <form action="/project/select" method="post" id="project-form">
 
             <input type="text"
                    name="projectPath"
@@ -213,9 +212,9 @@
 
             <div class="modal-actions">
 
-                <button type="submit"
-                        class="project-btn">
-                    Подключить
+                <button type="submit" class="project-btn" id="project-submit-btn">
+                    <span>Подключить</span>
+                    <span class="spinner"></span>
                 </button>
 
                 <button type="button"
