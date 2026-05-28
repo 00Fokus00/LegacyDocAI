@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${chat != null} ? 'LegacyDoc AI — ' + chat.title : 'LegacyDoc AI'">
+        LegacyDoc AI
+    </title>
+
+    <link rel="stylesheet" type="text/css" th:href="@{/css/chat.css}"/>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script defer th:src="@{/js/chat.js}"></script>
+</head>
+
+<body>
+
+<div class="chat-container">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="sidebar-top">
+
+            <div class="logo-block">
+                <h1>LegacyDoc AI</h1>
+                <p>Local LLM + RAG</p>
+            </div>
+
+            <!-- PROJECT PANEL -->
+            <div class="project-panel">
+
+                <div class="project-panel-header">
+                    📁 Текущий проект
+                </div>
+
+                <div class="project-path"
+                     th:text="${currentProjectPath != null ? currentProjectPath : 'Проект не выбран'}">
+                    /projects/legacy-system
+                </div>
+
+                <form action="/project/select" method="post">
+                    <button type="submit" class="project-btn">
+                        Выбрать директорию
+                    </button>
+                </form>
+
+                <!-- PROJECT INFO -->
+                <div class="project-info">
+
+                    <div class="info-item">
+                        <span>Файлов</span>
+                        <strong th:text="${projectFilesCount ?: 0}">245</strong>
+                    </div>
+
+                    <div class="info-item">
+                        <span>Java-классов</span>
+                        <strong th:text="${javaClassesCount ?: 0}">91</strong>
+                    </div>
+
+                    <div class="info-item">
+                        <span>Последняя индексация</span>
+                        <strong th:text="${lastIndexation ?: 'не выполнена'}">
+                            26.05.2026 19:22
+                        </strong>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- CHAT LIST -->
+            <div class="chat-list-wrapper">
+
+                <div class="section-title">
+                    Сессии анализа
+                </div>
+
+                <ul class="chat-list">
+
+                    <li th:each="c : ${chats}"
+                        th:classappend="${chat != null and chat.id != null and c.id == chat.id} ? 'active' : ''">
+
+                        <a th:href="@{/chat/{id}(id=${c.id})}">
+                            <span th:text="${c.title}">UserService analysis</span>
+                        </a>
+
+                        <form th:action="@{/chat/{id}/delete(id=${c.id})}"
+                              method="post"
+                              onsubmit="return confirm('Удалить сессию?');">
+
+                            <button type="submit" class="delete-chat-btn">
+                                ✕
+                            </button>
+
+                        </form>
+
+                    </li>
+
+                </ul>
+
+            </div>
+
+        </div>
+
+        <!-- NEW CHAT -->
+        <div class="sidebar-bottom">
+
+            <form action="/chat/new" method="post" class="new-chat-form">
+
+                <input type="text"
+                       name="title"
+                       placeholder="Название новой сессии"
+                       required/>
+
+                <button type="submit" class="new-chat">
+                    ➕ Новая сессия
+                </button>
+
+            </form>
+
+        </div>
+
+    </aside>
+
+    <!-- MAIN -->
+    <main class="chat-main">
+
+        <!-- HEADER -->
+        <div class="chat-header">
+
+            <h2>Документирование legacy-кода</h2>
+
+            <p>
+                Анализ проекта с помощью локальной LLM и Retrieval-Augmented Generation
+            </p>
+
+        </div>
+
+        <!-- MESSAGES -->
+        <div class="messages" id="messages">
+
+            <th:block th:if="${chat != null}">
+
+                <div th:if="${!#lists.isEmpty(chat.history)}"
+                     th:each="entry : ${chat.history}"
+                     th:class="${entry.role.role eq 'user'} ? 'message user' : 'message assistant'">
+
+                    <img th:src="${entry.role.role eq 'user'} ? '/images/user.png' : '/images/mentor.png'"
+                         alt="avatar">
+
+                    <div class="bubble"
+                         th:utext="${#strings.escapeXml(entry.content)}">
+                    </div>
+
+                </div>
+
+            </th:block>
+
+        </div>
+
+        <!-- INPUT -->
+        <div th:if="${chat != null}" class="input-area">
+
+            <form th:action="@{/chat/{chatId}/entry(chatId=${chat.id})}"
+                  method="post"
+                  id="chat-form">
+
+                <div class="input-bubble">
+
+                    <textarea id="chat-input"
+                              name="prompt"
+                              placeholder="Например: Опиши назначение класса UserService..."
+                              required></textarea>
+
+                    <button type="button" id="send-button">
+                        Отправить
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </main>
+
+</div>
+
+</body>
+</html>
