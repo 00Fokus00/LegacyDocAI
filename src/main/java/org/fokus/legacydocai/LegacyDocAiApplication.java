@@ -38,7 +38,7 @@ public class LegacyDocAiApplication {
 
     @Bean
     public ChatClient chatClient(ChatClient.Builder builder) {
-        return builder.defaultAdvisors(getHistoryAdvisor()/*, getRagAdviser()*/).build();
+        return builder.defaultAdvisors(getHistoryAdvisor(), getRagAdviser()).build();
     }
 
     private Advisor getRagAdviser() {

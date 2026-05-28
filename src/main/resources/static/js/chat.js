@@ -49,7 +49,7 @@ document.addEventListener("DOMContentLoaded", function () {
         aiDiv.className = "message assistant";
 
         aiDiv.innerHTML = `
-            <img src="/images/mentor.png" alt="AI">
+            <img src="/images/ai.png" alt="AI">
         `;
 
         const aiBubble = document.createElement("div");
@@ -109,20 +109,58 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // BUTTON CLICK
 
-    sendButton.addEventListener("click", function () {
-        sendMessage();
-    });
+    if (sendButton) {
+
+        sendButton.addEventListener("click", function () {
+            sendMessage();
+        });
+    }
 
     // ENTER SEND
 
-    chatInput.addEventListener("keydown", function (event) {
+    if (chatInput) {
 
-        if (event.key === "Enter" && !event.shiftKey) {
+        chatInput.addEventListener("keydown", function (event) {
 
-            event.preventDefault();
+            if (event.key === "Enter" && !event.shiftKey) {
 
-            sendMessage();
-        }
+                event.preventDefault();
+
+                sendMessage();
+            }
+        });
+    }
+
+    // PROJECT MODAL
+
+    const projectModal =
+        document.getElementById("project-modal");
+
+    const openProjectModal =
+        document.getElementById("open-project-modal");
+
+    const closeProjectModal =
+        document.getElementById("close-project-modal");
+
+    if (openProjectModal) {
+
+        openProjectModal.addEventListener("click", () => {
+
+            projectModal.classList.remove("hidden");
+        });
+    }
+
+    if (closeProjectModal) {
+
+        closeProjectModal.addEventListener("click", () => {
+
+            projectModal.classList.add("hidden");
+        });
+    }
+
+    document.querySelectorAll(".message.assistant .bubble.markdown-content").forEach(function (bubble) {
+        const rawMarkdown = bubble.textContent;
+        bubble.innerHTML = marked.parse(rawMarkdown);
     });
 
 });

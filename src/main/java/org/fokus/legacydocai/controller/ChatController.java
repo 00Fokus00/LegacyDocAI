@@ -1,6 +1,7 @@
 package org.fokus.legacydocai.controller;
 
 
+import jakarta.servlet.http.HttpSession;
 import org.fokus.legacydocai.model.Chat;
 import org.fokus.legacydocai.services.ChatService;
 import org.springframework.stereotype.Controller;
@@ -17,13 +18,15 @@ public class ChatController {
     }
 
     @GetMapping("/")
-    public String mainPage(ModelMap model) {
+    public String mainPage(ModelMap model, HttpSession session) {
+        addProjectInfo(session, model);
         model.addAttribute("chats", chatService.getAllChats());
         return "chat";
     }
 
     @GetMapping("/chat/{chatId}")
-    public String showChat(@PathVariable Long chatId, ModelMap model) {
+    public String showChat(@PathVariable Long chatId, ModelMap model, HttpSession session) {
+        addProjectInfo(session, model);
         model.addAttribute("chats", chatService.getAllChats());
         model.addAttribute("chat", chatService.getChat(chatId));
         return "chat";
@@ -46,6 +49,30 @@ public class ChatController {
     public String talkToModel(@PathVariable Long chatId, @RequestParam String prompt) {
         chatService.proceedInteraction(chatId, prompt);
         return "redirect:/chat/" + chatId;
+    }
+
+    private void addProjectInfo(HttpSession session,
+                                ModelMap model) {
+
+        model.addAttribute(
+                "currentProjectPath",
+                session.getAttribute("currentProjectPath")
+        );
+
+        model.addAttribute(
+                "projectFilesCount",
+                session.getAttribute("projectFilesCount")
+        );
+
+        model.addAttribute(
+                "javaClassesCount",
+                session.getAttribute("javaClassesCount")
+        );
+
+        model.addAttribute(
+                "lastIndexation",
+                session.getAttribute("lastIndexation")
+        );
     }
 }
 

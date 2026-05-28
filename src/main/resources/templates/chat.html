@@ -38,11 +38,11 @@
                     /projects/legacy-system
                 </div>
 
-                <form action="/project/select" method="post">
-                    <button type="submit" class="project-btn">
-                        Выбрать директорию
-                    </button>
-                </form>
+                <button type="button"
+                        class="project-btn"
+                        id="open-project-modal">
+                    Выбрать директорию
+                </button>
 
                 <!-- PROJECT INFO -->
                 <div class="project-info">
@@ -145,12 +145,12 @@
                      th:each="entry : ${chat.history}"
                      th:class="${entry.role.role eq 'user'} ? 'message user' : 'message assistant'">
 
-                    <img th:src="${entry.role.role eq 'user'} ? '/images/user.png' : '/images/mentor.png'"
+                    <img th:src="${entry.role.role eq 'user'} ? '/images/user.png' : '/images/ai.png'"
                          alt="avatar">
 
                     <div class="bubble"
-                         th:utext="${#strings.escapeXml(entry.content)}">
-                    </div>
+                         th:classappend="${entry.role.role eq 'assistant'} ? 'markdown-content' : ''"
+                         th:text="${entry.content}"> </div>
 
                 </div>
 
@@ -183,6 +183,52 @@
         </div>
 
     </main>
+
+</div>
+
+<!-- PROJECT MODAL -->
+
+<div class="modal" th:classappend="${error == null} ? 'hidden' : ''" id="project-modal">
+
+    <div class="modal-content">
+
+        <h3>Подключение проекта</h3>
+
+        <div th:if="${error}" class="error-message" style="color: red; margin-bottom: 10px;">
+            ⚠️ <span th:text="${error}">Ошибка</span>
+        </div>
+
+        <p>
+            Укажите путь к директории проекта для RAG-индексации
+        </p>
+
+        <form action="/project/select"
+              method="post">
+
+            <input type="text"
+                   name="projectPath"
+                   id="project-input"
+                   placeholder="C:/projects/my-app"
+                   required>
+
+            <div class="modal-actions">
+
+                <button type="submit"
+                        class="project-btn">
+                    Подключить
+                </button>
+
+                <button type="button"
+                        id="close-project-modal"
+                        class="cancel-btn">
+                    Отмена
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
 
 </div>
 

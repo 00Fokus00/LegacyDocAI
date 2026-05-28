@@ -7,8 +7,6 @@ import org.springframework.ai.document.Document;
 import org.springframework.ai.reader.TextReader;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.vectorstore.VectorStore;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.data.util.Pair;
@@ -19,7 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Service
-public class DocumentLoaderService implements CommandLineRunner {
+public class DocumentLoaderService {
 
     private final DocumentRepository documentRepository;
 
@@ -35,8 +33,35 @@ public class DocumentLoaderService implements CommandLineRunner {
 
 
     @SneakyThrows
-    public void loadDocuments() {
-        List<Resource> resources = Arrays.stream(resolver.getResources("classpath:/knowledgebase/**/*.txt")).toList();
+    public void loadDocuments(String projectPath) {
+
+        String normalizedPath = projectPath.replace("\\", "/");
+
+        if (!normalizedPath.endsWith("/")) {
+            normalizedPath += "/";
+        }
+
+        String locationPattern = "file:" + normalizedPath + "**/*.java";
+
+        List<Resource> resources = Arrays.stream(resolver.getResources(locationPattern)).toList();
+        List<LoadedDocument> allLoadedDocs = documentRepository.findAll();
+
+        for (LoadedDocument doc : allLoadedDocs) {
+            String filename = doc.getFilename();
+
+            Resource matchingResource = resources.stream()
+                    .filter(r -> filename.equals(r.getFilename()))
+                    .findFirst()
+                    .orElse(null);
+
+            String currentHash = matchingResource != null ? calcContentHash(matchingResource) : null;
+
+            // проводим зачистку старых данных
+            if (currentHash == null || !currentHash.equals(doc.getContentHash())) {
+                documentRepository.deleteVectorsByFilename(filename);
+                documentRepository.deleteByFilename(filename);
+            }
+        }
 
         resources.stream()
                 .map(resource -> Pair.of(resource, calcContentHash(resource)))
@@ -49,7 +74,7 @@ public class DocumentLoaderService implements CommandLineRunner {
                     vectorStore.accept(chunks);
 
                     LoadedDocument loadedDocument = LoadedDocument.builder()
-                            .documentType("txt")
+                            .documentType("java")
                             .chunkCount(chunks.size())
                             .filename(resource.getFilename())
                             .contentHash(pair.getSecond())
@@ -64,11 +89,6 @@ public class DocumentLoaderService implements CommandLineRunner {
     @SneakyThrows
     private String calcContentHash(Resource resource) {
         return DigestUtils.md5DigestAsHex(resource.getInputStream());
-    }
-
-    @Override
-    public void run(String... args) throws Exception {
-        loadDocuments();
     }
 }
 
